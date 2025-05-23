@@ -114,7 +114,7 @@ Enable offline access and mobile install.
 
 ## ✅ Submission Checklist
 
-- [x] Public (or private‑invite) GitHub repo
+- [x] Public GitHub repo: https://github.com/HunterKs/link-saver
 - [x] Live link ([Render](https://link-saver-6h6d.onrender.com))
 - [x] Clear README: tech stack, setup, "what I'd do next," and time spent
 - [x] 2–5 screenshots or a short GIF (to be added)
