@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bookmarks</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header-container">
+            <a href="{% url 'add_bookmark' %}" class="add-bookmark-btn">Add Bookmark</a>
+            <h2>Your Bookmarks</h2>
+            <div class="user-profile-trigger" id="userProfileTrigger" tabindex="0" role="button" aria-label="User Profile">
+                <img src="{% static 'default_user_icon.png' %}" alt="User" class="user-avatar">
+                <div class="user-profile-name">
+                    {{ user.first_name }} {{ user.last_name }}
+                </div>
+            </div>
+        </div>
+        <div class="profile-modal-overlay" id="profileModalOverlay" tabindex="-1"></div>
+<div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+    <div class="profile-modal-content">
+        <img src="{% static 'default_user_icon.png' %}" alt="User" class="profile-avatar" />
+        <h3 id="profileModalTitle" class="profile-username">
+            {{ user.first_name }} {{ user.last_name }}
+        </h3>
+        <div class="profile-email">
+            <strong>Email:</strong> {{ user.email }}
+        </div>
+        <div class="profile-mobile">
+            <strong>Mobile:</strong> {{ user.mobile_number }}
+        </div>
+        <div class="profile-bookmark-count">
+            <strong>Bookmarks saved:</strong> {{ bookmarks|length }}
+        </div>
+        <form action="{% url 'logout' %}" method="post" style="margin: 18px 0 8px 0;">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+        <button class="close-profile-btn" id="closeProfileBtn" aria-label="Close Profile Modal">Close</button>
+    </div>
+</div>
+
+        
+        <table class="bookmark-table">
+            <thead>
+                <tr>
+                    <th>URL</th>
+                    <th>Summary</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for bookmark in bookmarks %}
+                <tr class="bookmark-row" data-row="{{ forloop.counter0 }}">
+                    <td>
+                        <a href="{{ bookmark.url }}" class="text-link" target="_blank">
+                            {{ bookmark.url|truncatechars:40 }}
+                        </a>
+                    </td>
+                    <td>
+                        <span class="summary-preview">
+                            {{ bookmark.summary|truncatechars:90 }}
+                        </span>
+                    </td>
+                    <td>
+                        <form action="{% url 'resummarize_bookmark' bookmark.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn">Resummarize</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr class="accordion-content" id="accordion-{{ forloop.counter0 }}">
+                    <td colspan="3">
+                        <div class="accordion-inner">
+                            <strong>Full Summary:</strong>
+                            <div>{{ bookmark.summary }}</div>
+                            <strong>URL:</strong>
+                            <a href="{{ bookmark.url }}" class="text-link" target="_blank">{{ bookmark.url }}</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure all accordions start closed
+            document.querySelectorAll('.accordion-content').forEach(function(acc) {
+                acc.classList.remove('open');
+            });
+            
+            document.querySelectorAll('.bookmark-row').forEach(function(r) {
+                r.classList.remove('expanded');
+            });
+            
+            // Get all bookmark rows
+            const bookmarkRows = document.querySelectorAll('.bookmark-row');
+            
+            bookmarkRows.forEach(function(row) {
+                row.addEventListener('click', function(e) {
+                    // Prevent click if clicking on a link or button
+                    if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('form')) {
+                        return;
+                    }
+                    
+                    const rowIndex = row.getAttribute('data-row');
+                    const accordion = document.getElementById('accordion-' + rowIndex);
+                    const isCurrentlyOpen = accordion.classList.contains('open');
+                    
+                    // Close all accordions
+                    document.querySelectorAll('.accordion-content').forEach(function(acc) {
+                        acc.classList.remove('open');
+                    });
+                    
+                    // Remove expanded class from all rows
+                    document.querySelectorAll('.bookmark-row').forEach(function(r) {
+                        r.classList.remove('expanded');
+                    });
+                    
+                    // If this accordion wasn't open, open it
+                    if (!isCurrentlyOpen) {
+                        accordion.classList.add('open');
+                        row.classList.add('expanded');
+                    }
+                });
+            });
+            
+            // Handle form submissions with loading states
+            const forms = document.querySelectorAll('form');
+            forms.forEach(function(form) {
+                form.addEventListener('submit', function() {
+                    const row = form.closest('.bookmark-row');
+                    const button = form.querySelector('.btn');
+                    
+                    row.classList.add('loading');
+                    button.textContent = 'Processing...';
+                    button.disabled = true;
+                });
+            });
+        });
+    </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ... your existing JS ...
+
+    // User profile modal logic
+    const userProfileTrigger = document.getElementById('userProfileTrigger');
+    const profileModal = document.getElementById('profileModal');
+    const profileModalOverlay = document.getElementById('profileModalOverlay');
+    const closeProfileBtn = document.getElementById('closeProfileBtn');
+
+    userProfileTrigger.addEventListener('click', function() {
+        profileModal.style.display = 'block';
+        profileModalOverlay.style.display = 'block';
+    });
+    closeProfileBtn.addEventListener('click', function() {
+        profileModal.style.display = 'none';
+        profileModalOverlay.style.display = 'none';
+    });
+    profileModalOverlay.addEventListener('click', function() {
+        profileModal.style.display = 'none';
+        profileModalOverlay.style.display = 'none';
+    });
+});
+</script>
+</body>
+</html>
