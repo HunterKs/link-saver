@@ -1,12 +1,11 @@
 from django.shortcuts import render
 from .models import Bookmark
 from .forms import BookmarkForm, CustomUserCreationForm, EmailAuthenticationForm
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .utils import fetch_title_and_favicon, fetch_summary, resummarize_summary
+from .utils import fetch_title_and_favicon, fetch_summary
 from django.contrib.auth import logout
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import  redirect
 
 def login_view(request):
     if request.method == 'POST':
@@ -62,10 +61,3 @@ def custom_logout(request):
     logout(request)
     return redirect('/accounts/login/')  
 
-@login_required
-def resummarize_bookmark(request, bookmark_id):
-    bookmark = get_object_or_404(Bookmark, id=bookmark_id, user=request.user)
-    new_summary = resummarize_summary(bookmark.summary)
-    bookmark.summary = new_summary
-    bookmark.save()
-    return redirect('list_bookmarks')
