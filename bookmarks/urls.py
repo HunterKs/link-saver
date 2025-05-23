@@ -6,5 +6,4 @@ urlpatterns = [
     path('register/', views.register, name='register'), 
     path('', views.list_bookmarks, name='list_bookmarks'),
     path('logout/', views.custom_logout, name='logout'),
-    path('resummarize/<int:bookmark_id>/', views.resummarize_bookmark, name='resummarize_bookmark'),
 ]
