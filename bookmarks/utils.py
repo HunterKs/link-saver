@@ -1,7 +1,7 @@
-import requests , urllib, re, random
+import requests , urllib, re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from transformers import pipeline
+
 
 def fetch_title_and_favicon(url):
     try:
@@ -69,40 +69,3 @@ def fetch_summary(url, max_sentences=6):
     except Exception as e:
         return f"Error fetching summary: {e}"
 
-_paraphraser = None
-def get_paraphraser():
-    global _paraphraser
-    if _paraphraser is None:
-        _paraphraser = pipeline("text2text-generation", model="Vamsi/T5_Paraphrase_Paws")
-    return _paraphraser
-
-def split_into_sentences(text):
-    return re.split(r'(?<=[.!?])\s+', text)
-
-def resummarize_summary(summary, num_return_sequences=3):
-    if not summary or summary.strip() == "Summary not available.":
-        return "Summary not available."
-    paraphraser = get_paraphraser()
-    sentences = split_into_sentences(summary)
-    new_sentences = []
-    for sent in sentences:
-        if len(sent.strip().split()) < 5:
-            new_sentences.append(sent)
-            continue
-        paraphrases = paraphraser(
-            f"paraphrase: {sent} </s>",
-             max_new_tokens=256,
-            num_return_sequences=num_return_sequences,
-            num_beams=num_return_sequences*2,
-            do_sample=True,
-            top_k=120,
-            top_p=0.95,
-            temperature=0.9
-        )
-        candidates = [p['generated_text'] for p in paraphrases if p['generated_text'].strip().lower() != sent.strip().lower()]
-        if candidates:
-            new_sentences.append(random.choice(candidates))
-        else:
-            new_sentences.append(sent)
-    return ' '.join(new_sentences)
-   
