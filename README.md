@@ -55,8 +55,8 @@ link-saver/
 ├── static/ # CSS, JS, images
 ├── db.sqlite3 # Database (default)
 ├── manage.py
-├── venv/ # Virtual environment (should be in .gitignore)
-└── requirements.txt # Python dependencies
+└── venv/ # Virtual environment (should be in .gitignore)
+
 
 
 
